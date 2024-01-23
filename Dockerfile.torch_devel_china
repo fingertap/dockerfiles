@@ -1,0 +1,25 @@
+FROM pytorch/pytorch:2.1.2-cuda11.8-cudnn8-devel
+
+# Change the apt and pip mirrow
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+    sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN pip config set global.index-url "https://pypi.tuna.tsinghua.edu.cn/simple" && \
+    pip config set global.extra-index-url "https://mirrors.aliyun.com/pypi/simple/"
+
+# Install some packages I usually use
+RUN apt update && apt install -y git vim screen iputils-ping 
+
+# Set the screen configs
+RUN echo "shell /bin/bash" > /root/.screenrc && echo 'alias screen="screen -U"' >> /root/.bashrc
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS=yes
+ENV TZ=Asia/Shanghai
+
+# Install Microsoft fonts, as I will use it in plotting figures
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ttf-mscorefonts-installer fontconfig && \
+    fc-cache -f
+
+# Install some pip packages I frequently use
+RUN pip install jupyter ipykernel pandas scikit-learn pandas numpy scipy matplotlib
